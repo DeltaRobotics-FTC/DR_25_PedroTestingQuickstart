@@ -162,7 +162,7 @@ public class LateralZeroPowerAccelerationTuner extends OpMode {
             for (Double acceleration : accelerations) {
                 average += acceleration;
             }
-            average /= (double) accelerations.size();
+            average /= accelerations.size();
 
             telemetryA.addData("lateral zero power acceleration (deceleration):", average);
             telemetryA.update();
