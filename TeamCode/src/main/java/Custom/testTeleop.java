@@ -26,20 +26,36 @@ import pedroPathing.constants.LConstants;
 
 public class testTeleop extends LinearOpMode
 {
+    private Follower follower;
+
     public Servo LHE = null;
     public Servo RHE = null;
     public Servo wrist = null;
     public Servo claw = null;
 
+    public boolean buttonLT = true;
+    public boolean buttonRT = true;
+    public boolean buttonLB = true;
+    public boolean buttonRB = true;
     public boolean buttonA = true;
     public boolean buttonB = true;
     public boolean buttonX = true;
     public boolean buttonY = true;
+    public boolean buttonDU = true;
+    public boolean buttonDD = true;
+    public boolean buttonDR = true;
+    public boolean buttonDL = true;
+
+    public double speed = .75;
+    private final Pose startPose = new Pose(0,0,0);
+
 
 
     @Override
     public void runOpMode() throws InterruptedException
     {
+        BatbotHardwareMap robot = new BatbotHardwareMap(hardwareMap);
+
         LHE = hardwareMap.servo.get("LHE");
         RHE = hardwareMap.servo.get("RHE");
 
@@ -48,58 +64,81 @@ public class testTeleop extends LinearOpMode
 
         while (!isStarted() && !isStopRequested()) {
 
-            //Bigger number is backwards
-            LHE.setPosition(.9);
-            RHE.setPosition(.9);
+            Constants.setConstants(FConstants.class, LConstants.class);
+            follower = new Follower(hardwareMap);
+            follower.setStartingPose(startPose);
 
-            //wrist.setPosition(.5);
+            //small numbers are out
+            LHE.setPosition(.905);
+            RHE.setPosition(.905);
+
+            //lower numbers go up
+            wrist.setPosition(.65);
             //claw.setPosition(.5);
 
         }
 
         while (opModeIsActive())
         {
-            if(gamepad1.a && buttonA){
+
+            follower.setTeleOpMovementVectors(gamepad1.right_stick_y, -gamepad1.right_stick_x, -gamepad1.left_stick_x, true);
+            follower.update();
+
+
+            //pushing the slides out
+            if(gamepad1.right_bumper && buttonRB){
 
                 LHE.setPosition(.75);
                 RHE.setPosition(.75);
 
+                buttonRB = false;
+            }
+
+            if(!gamepad1.right_bumper && !buttonRB){
+
+                buttonRB = true;
+            }
+
+
+            // bringing the slides inside
+             if(gamepad1.left_bumper && buttonLB){
+                LHE.setPosition(.905);
+                RHE.setPosition(.905);
+
+                buttonLB = false;
+             }
+             if(!gamepad1.left_bumper && !buttonLB){
+
+                buttonLB = true;
+            }
+
+             if(gamepad1.y && buttonY){
+
+                 wrist.setPosition(.5);
+
+                 buttonY = false;
+
+             }
+
+            if(!gamepad1.y && !buttonY){
+
+                buttonY = true;
+
+            }
+
+
+            if(gamepad1.a && buttonA){
+
+                wrist.setPosition(.65);
+
                 buttonA = false;
+
             }
 
             if(!gamepad1.a && !buttonA){
 
                 buttonA = true;
-            }
 
-
-
-            if(gamepad1.b && buttonB){
-
-                LHE.setPosition(.1);
-                RHE.setPosition(.9);
-
-                buttonB = false;
-            }
-
-            if(!gamepad1.b && !buttonB){
-
-                buttonB = true;
-            }
-
-
-
-            if(gamepad1.x && buttonX){
-
-                LHE.setPosition(.25);
-                RHE.setPosition(.75);
-
-                buttonX = false;
-            }
-
-            if(!gamepad1.x && !buttonX){
-
-                buttonX = true;
             }
 
         }

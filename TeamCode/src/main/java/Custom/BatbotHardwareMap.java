@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.pedropathing.follower.Follower;
 
 @Config //We need this for Dashboard to change variables
 public class BatbotHardwareMap {
@@ -64,8 +65,8 @@ public class BatbotHardwareMap {
         motorRF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorRB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        motorLB.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorRF.setDirection(DcMotorSimple.Direction.REVERSE);
+        //motorRB.setDirection(DcMotorSimple.Direction.REVERSE);
+        //motorLB.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motorRF.setPower(0);
         motorLF.setPower(0);
@@ -90,13 +91,13 @@ public class BatbotHardwareMap {
         ControlHub_VoltageSensor = ahwMap.get(VoltageSensor.class, "Control Hub");
     }
 
-    //public void mecanumDrive(double forward, double strafe, double heading, double speed){
-//
-    //    motorRF.setPower((((forward - strafe) * 1) - (heading * 1)) * speed);
-    //    motorRB.setPower((((forward + strafe) * 1) - (heading * 1)) * speed);
-    //    motorLB.setPower((((forward - strafe) * 1) + (heading * 1)) * speed);
-    //    motorLF.setPower((((forward + strafe) * 1) + (heading * 1)) * speed);
-    //}
+    public void mecanumDrive(double forward, double strafe, double heading, double speed){
+
+        motorRF.setPower((((forward - strafe) * 1) - (heading * 1)) * speed);
+        motorRB.setPower((((forward + strafe) * 1) - (heading * 1)) * speed);
+        motorLB.setPower((((forward - strafe) * 1) + (heading * 1)) * speed);
+        motorLF.setPower((((forward + strafe) * 1) + (heading * 1)) * speed);
+    }
 
     public void resetDriveEncoders()
     {
