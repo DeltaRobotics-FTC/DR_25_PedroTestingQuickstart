@@ -30,6 +30,8 @@ import pedroPathing.constants.LConstants;
 @Autonomous(name = "stepByStepAuto")
 public class stepByStepAuto extends OpMode {
 
+    BatbotHardwareMap robot = new BatbotHardwareMap(hardwareMap);
+
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
 

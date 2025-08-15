@@ -1,6 +1,7 @@
 package Custom;
 
 
+import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -17,6 +18,11 @@ import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
+
+import org.firstinspires.ftc.robotcore.internal.system.Deadline;
+
+import java.util.concurrent.TimeUnit;
+
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
@@ -27,6 +33,9 @@ import pedroPathing.constants.LConstants;
 public class testTeleop extends LinearOpMode
 {
     private Follower follower;
+    private final int READ_PERIOD = 1;
+
+    private HuskyLens huskyLens;
 
     public Servo LHE = null;
     public Servo RHE = null;
@@ -56,6 +65,22 @@ public class testTeleop extends LinearOpMode
     {
         BatbotHardwareMap robot = new BatbotHardwareMap(hardwareMap);
 
+        huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
+
+        Deadline rateLimit = new Deadline(READ_PERIOD, TimeUnit.SECONDS);
+
+        rateLimit.expire();
+
+        if (!huskyLens.knock()) {
+            telemetry.addData(">>", "Problem communicating with " + huskyLens.getDeviceName());
+        } else {
+            telemetry.addData(">>", "Press start to continue");
+        }
+
+        huskyLens.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
+
+        telemetry.update();
+
         LHE = hardwareMap.servo.get("LHE");
         RHE = hardwareMap.servo.get("RHE");
 
@@ -72,7 +97,9 @@ public class testTeleop extends LinearOpMode
 
         //lower numbers go up
         wrist.setPosition(.65);
-        //claw.setPosition(.5);
+
+        //bigger numbers are open
+        claw.setPosition(.6);
 
         waitForStart();
 
@@ -86,37 +113,50 @@ public class testTeleop extends LinearOpMode
             follower.setTeleOpMovementVectors(-gamepad1.right_stick_y, -gamepad1.right_stick_x, -gamepad1.left_stick_x, true);
             follower.update();
 
+            if (!rateLimit.hasExpired()) {
+                continue;
+            }
+            rateLimit.reset();
+
+            HuskyLens.Block[] blocks = huskyLens.blocks();
+            telemetry.addData("Block count", blocks.length);
+            for (int i = 0; i < blocks.length; i++) {
+                telemetry.addData("Block", blocks[i].toString());
+
+
+            }
+            telemetry.update();
 
             //pushing the slides out
-            if(gamepad1.right_bumper && buttonRB){
+            if(gamepad1.right_trigger > .5 && buttonRT){
 
-                LHE.setPosition(.75);
-                RHE.setPosition(.75);
+                LHE.setPosition(robot.SLIDES_OUT);
+                RHE.setPosition(robot.SLIDES_OUT);
 
-                buttonRB = false;
+                buttonRT = false;
             }
 
-            if(!gamepad1.right_bumper && !buttonRB){
+            if(gamepad1.right_trigger < .5 && !buttonRT){
 
-                buttonRB = true;
+                buttonRT = true;
             }
-
 
             // bringing the slides inside
-             if(gamepad1.left_bumper && buttonLB){
-                LHE.setPosition(.905);
-                RHE.setPosition(.905);
+             if(gamepad1.left_trigger > .5 && buttonLT){
+                LHE.setPosition(robot.SLIDES_INSIDE);
+                RHE.setPosition(robot.SLIDES_INSIDE);
 
-                buttonLB = false;
+                buttonLT = false;
              }
-             if(!gamepad1.left_bumper && !buttonLB){
+             if(gamepad1.left_trigger < .5 && !buttonLT){
 
-                buttonLB = true;
+                buttonLT = true;
             }
 
+             //wrist up position
              if(gamepad1.y && buttonY){
 
-                 wrist.setPosition(.5);
+                 wrist.setPosition(robot.WRIST_UP);
 
                  buttonY = false;
 
@@ -128,10 +168,10 @@ public class testTeleop extends LinearOpMode
 
             }
 
-
+            //wrist down position
             if(gamepad1.a && buttonA){
 
-                wrist.setPosition(.65);
+                wrist.setPosition(robot.WRIST_DOWN);
 
                 buttonA = false;
 
@@ -142,6 +182,37 @@ public class testTeleop extends LinearOpMode
                 buttonA = true;
 
             }
+
+            //claw closed position
+            if(gamepad1.left_bumper && buttonLB){
+
+                claw.setPosition(robot.CLAW_CLOSE);
+
+                buttonLB = false;
+
+            }
+
+            if(!gamepad1.left_bumper && !buttonLB){
+
+                buttonLB = true;
+
+            }
+
+            //claw open position
+            if(gamepad1.right_bumper && buttonRB){
+
+                claw.setPosition(robot.CLAW_OPEN);
+
+                buttonRB = false;
+
+            }
+
+            if(!gamepad1.right_bumper && !buttonRB){
+
+                buttonRB = true;
+
+            }
+
 
         }
     }

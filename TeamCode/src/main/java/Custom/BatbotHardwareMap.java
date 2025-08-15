@@ -1,5 +1,8 @@
 package Custom;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -12,6 +15,11 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.pedropathing.follower.Follower;
+import com.qualcomm.hardware.dfrobot.HuskyLens;
+
+import org.firstinspires.ftc.robotcore.internal.system.Deadline;
+
+import java.util.concurrent.TimeUnit;
 
 @Config //We need this for Dashboard to change variables
 public class BatbotHardwareMap {
@@ -43,10 +51,23 @@ public class BatbotHardwareMap {
 
     public static boolean timerInitted = false;
 
+    private final int READ_PERIOD = 1;
+
+    private HuskyLens huskyLens;
+    public final double CLAW_OPEN = 6;
+    public final double CLAW_CLOSE = .8;
+
+    public final double WRIST_UP = .5;
+    public final double WRIST_DOWN = .65;
+
+    public final double SLIDES_OUT = .75;
+    public final double SLIDES_INSIDE = .905;
+
     public static ElapsedTime currentTime = new ElapsedTime();
 
     public BatbotHardwareMap(HardwareMap ahwMap)
     {
+
 
         //drive motors
         motorRF = ahwMap.dcMotor.get("motorRF");
@@ -176,6 +197,7 @@ public class BatbotHardwareMap {
         return ti;
 
     }
-
-
 }
+
+
+
