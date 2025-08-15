@@ -10,6 +10,7 @@ import java.util.List;
 @TeleOp(group = "Robot Utilities", name = "Servo Tuner")
 public class ServoTuner extends LinearOpMode
 {
+
     private enum ServoTunerCommands
     {
         INCREMENT_VALUE,
@@ -76,8 +77,21 @@ public class ServoTuner extends LinearOpMode
 
     private static final ServoTunerModes DEFAULT_MODE = ServoTunerModes.CHANGE_GRANULARITY;
 
+    private class ServoData
+    {
+        public double initPosition = DEFAULT_POSITION;
+        public double proposedPosition = DEFAULT_POSITION;
+    }
+
+    private double currentValue = 0;
+    private double proposedValue = 0;
+    private int currentServoIndex = 0;
     private ServoTunerModes mode = DEFAULT_MODE;
     private ServoTunerCommands command = ServoTunerCommands.NO_COMMAND;
+
+    private double granularity = DEFAULT_GRANULARITY;
+
+    private List<ServoData> servoData = new ArrayList<ServoData>();
 
     private List<Servo> servos = new ArrayList<Servo>();
 
@@ -87,6 +101,11 @@ public class ServoTuner extends LinearOpMode
         for(int i = 0; i < MAX_SERVO_COUNT; ++i)
         {
             servos.add(i, hardwareMap.servo.get("servo_" + (i + 1)));
+        }
+
+        for(int i = 0; i < MAX_SERVO_COUNT; ++i)
+        {
+            servoData.add(i, new ServoData());
         }
 
         waitForStart();
@@ -124,6 +143,85 @@ public class ServoTuner extends LinearOpMode
             }
 
             // Now that we know the command, perform it!
+            switch(command)
+            {
+                case INCREMENT_SERVO_INDEX:
+                {
+                    currentServoIndex = (currentServoIndex + 1) % MAX_SERVO_COUNT;
+                    break;
+                }
+                case DECREMENT_SERVO_INDEX:
+                {
+                    if(currentServoIndex == 0)
+                    {
+                        currentServoIndex = MAX_SERVO_COUNT - 1;
+                    }
+                    else
+                    {
+                        currentServoIndex--;
+                    }
+                    break;
+                }
+                case INCREMENT_VALUE:
+                {
+                    if(mode != ServoTunerModes.INIT)
+                    {
+                        if(mode == ServoTunerModes.CHANGE_GRANULARITY)
+                        {
+                            granularity = granularity + GRANULARITY_DELTA;
+                            if(granularity > GRANULARITY_MAX)
+                            {
+                                granularity = GRANULARITY_MAX;
+                            }
+                        }
+                        else
+                        {
+                            proposedValue += granularity;
+                            if(proposedValue > 1.0)
+                            {
+                                proposedValue = 1.0;
+                            }
+                        }
+                    }
+                    break;
+                }
+                case DECREMENT_VALUE:
+                {
+                    if(mode != ServoTunerModes.INIT)
+                    {
+                        if(mode == ServoTunerModes.CHANGE_GRANULARITY)
+                        {
+                            granularity = granularity - GRANULARITY_DELTA;
+                            if(granularity < GRANULARITY_MIN)
+                            {
+                                granularity = GRANULARITY_MIN;
+                            }
+                        }
+                        else
+                        {
+                            proposedValue -= granularity;
+                            if(proposedValue < 0.0)
+                            {
+                                proposedValue = 0.0;
+                            }
+                        }
+                    }
+                    break;
+                }
+                case TOGGLE_MODE:
+                {
+                    mode = mode.getNextMode();
+                    break;
+                }
+                case EXECUTE_ACTION:
+                {
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+            }
         }
     }
 }
