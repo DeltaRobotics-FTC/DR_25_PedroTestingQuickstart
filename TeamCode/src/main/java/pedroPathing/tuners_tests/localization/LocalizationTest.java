@@ -9,6 +9,7 @@ import static com.pedropathing.follower.FollowerConstants.leftRearMotorDirection
 import static com.pedropathing.follower.FollowerConstants.rightFrontMotorDirection;
 import static com.pedropathing.follower.FollowerConstants.rightRearMotorDirection;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -39,6 +40,7 @@ import pedroPathing.constants.*;
  */
 @Config
 @TeleOp(group = "Teleop Test", name = "Localization Test")
+@Disabled
 public class LocalizationTest extends OpMode {
     private PoseUpdater poseUpdater;
     private DashboardPoseTracker dashboardPoseTracker;

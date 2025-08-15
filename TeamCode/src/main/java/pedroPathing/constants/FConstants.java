@@ -10,10 +10,10 @@ public class FConstants {
     static {
         FollowerConstants.localizers = Localizers.THREE_WHEEL;
 
-        FollowerConstants.leftFrontMotorName = "leftFront";
-        FollowerConstants.leftRearMotorName = "leftRear";
-        FollowerConstants.rightFrontMotorName = "rightFront";
-        FollowerConstants.rightRearMotorName = "rightRear";
+        FollowerConstants.leftFrontMotorName = "motorLF";
+        FollowerConstants.leftRearMotorName = "motorLB";
+        FollowerConstants.rightFrontMotorName = "motorRF";
+        FollowerConstants.rightRearMotorName = "motorRB";
 
         FollowerConstants.leftFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
         FollowerConstants.leftRearMotorDirection = DcMotorSimple.Direction.FORWARD;

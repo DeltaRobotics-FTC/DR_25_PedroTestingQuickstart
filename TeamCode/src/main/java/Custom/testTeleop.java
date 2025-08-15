@@ -62,26 +62,28 @@ public class testTeleop extends LinearOpMode
         wrist = hardwareMap.servo.get("wrist");
         claw = hardwareMap.servo.get("claw");
 
-        while (!isStarted() && !isStopRequested()) {
+        Constants.setConstants(FConstants.class, LConstants.class);
+        follower = new Follower(hardwareMap);
+        follower.setStartingPose(startPose);
 
-            Constants.setConstants(FConstants.class, LConstants.class);
-            follower = new Follower(hardwareMap);
-            follower.setStartingPose(startPose);
+        //small numbers are out
+        LHE.setPosition(.905);
+        RHE.setPosition(.905);
 
-            //small numbers are out
-            LHE.setPosition(.905);
-            RHE.setPosition(.905);
+        //lower numbers go up
+        wrist.setPosition(.65);
+        //claw.setPosition(.5);
 
-            //lower numbers go up
-            wrist.setPosition(.65);
-            //claw.setPosition(.5);
+        waitForStart();
 
-        }
+        follower.startTeleopDrive();
+
+
 
         while (opModeIsActive())
         {
 
-            follower.setTeleOpMovementVectors(gamepad1.right_stick_y, -gamepad1.right_stick_x, -gamepad1.left_stick_x, true);
+            follower.setTeleOpMovementVectors(-gamepad1.right_stick_y, -gamepad1.right_stick_x, -gamepad1.left_stick_x, true);
             follower.update();
 
 
