@@ -54,8 +54,8 @@ public class BatbotHardwareMap {
     private final int READ_PERIOD = 1;
 
     private HuskyLens huskyLens;
-    public final double CLAW_OPEN = 6;
-    public final double CLAW_CLOSE = .8;
+    public final double CLAW_OPEN = 1;
+    public final double CLAW_CLOSE = .6;
 
     public final double WRIST_UP = .5;
     public final double WRIST_DOWN = .65;

@@ -55,14 +55,13 @@ public class testTeleop extends LinearOpMode
     public boolean buttonDR = true;
     public boolean buttonDL = true;
 
-    public double speed = .75;
+    public double speed = .1;
     private final Pose startPose = new Pose(0,0,0);
 
 
 
     @Override
-    public void runOpMode() throws InterruptedException
-    {
+    public void runOpMode() throws InterruptedException {
         BatbotHardwareMap robot = new BatbotHardwareMap(hardwareMap);
 
         huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
@@ -107,8 +106,7 @@ public class testTeleop extends LinearOpMode
 
 
 
-        while (opModeIsActive())
-        {
+        while (opModeIsActive()) {
 
             follower.setTeleOpMovementVectors(-gamepad1.right_stick_y, -gamepad1.right_stick_x, -gamepad1.left_stick_x, true);
             follower.update();
@@ -119,13 +117,22 @@ public class testTeleop extends LinearOpMode
             rateLimit.reset();
 
             HuskyLens.Block[] blocks = huskyLens.blocks();
-            telemetry.addData("Block count", blocks.length);
-            for (int i = 0; i < blocks.length; i++) {
-                telemetry.addData("Block", blocks[i].toString());
 
+            /////////////////////////////////////////////////////////////////////////////////
+
+            for (int i = 0; i < blocks.length; i++){
+
+                if(blocks[i].id == 1) {
+                    telemetry.addData("positionX", String.valueOf(blocks[i].x));
+                    telemetry.addData("positionY", String.valueOf(blocks[i].y));
+
+
+                }
 
             }
             telemetry.update();
+
+
 
             //pushing the slides out
             if(gamepad1.right_trigger > .5 && buttonRT){
