@@ -1,11 +1,16 @@
 package RobotUtilities;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 @TeleOp(group = "Robot Utilities", name = "Servo Tuner")
 public class ServoTuner extends LinearOpMode
@@ -95,6 +100,8 @@ public class ServoTuner extends LinearOpMode
 
     private List<Servo> servos = new ArrayList<Servo>();
 
+    private List<Integer> validServoIndices = new ArrayList<>();
+
     private boolean canExecuteAction = true;
 
     @Override
@@ -102,10 +109,18 @@ public class ServoTuner extends LinearOpMode
     {
         for(int i = 0; i < MAX_SERVO_COUNT; ++i)
         {
-            servos.add(i, hardwareMap.servo.get("servo_" + (i + 1)));
+            try
+            {
+                servos.add(i, hardwareMap.servo.get("servo_" + (i + 1)));
+                validServoIndices.add(i);
+            }
+            catch (IllegalArgumentException e)
+            {
+                // Servo invalid.
+            }
         }
 
-        for(int i = 0; i < MAX_SERVO_COUNT; ++i)
+        for(int i : validServoIndices)
         {
             servoData.add(i, new ServoData());
         }
@@ -161,7 +176,20 @@ public class ServoTuner extends LinearOpMode
                 {
                     case INCREMENT_SERVO_INDEX:
                     {
-                        currentServoIndex = (currentServoIndex + 1) % MAX_SERVO_COUNT;
+                        currentServoIndex = validServoIndices.get((validServoIndices.indexOf(currentServoIndex) + 1) % validServoIndices.size());
+                        switch(mode)
+                        {
+                            case CHANGE_POSITION:
+                                proposedValue = servoData.get(currentServoIndex).proposedPosition;
+                                currentValue = proposedValue;
+                                break;
+                            case CHANGE_INIT_POSITION:
+                                proposedValue = servoData.get(currentServoIndex).initPosition;
+                                currentValue = proposedValue;
+                            break;
+                            default:
+                                break;
+                        }
                         break;
                     }
                     case DECREMENT_SERVO_INDEX:
@@ -174,6 +202,20 @@ public class ServoTuner extends LinearOpMode
                         {
                             currentServoIndex--;
                         }
+                        switch(mode)
+                        {
+                            case CHANGE_POSITION:
+                                proposedValue = servoData.get(currentServoIndex).proposedPosition;
+                                currentValue = proposedValue;
+                                break;
+                            case CHANGE_INIT_POSITION:
+                                proposedValue = servoData.get(currentServoIndex).initPosition;
+                                currentValue = proposedValue;
+                                break;
+                            default:
+                                break;
+                        }
+
                         break;
                     }
                     case INCREMENT_VALUE:
@@ -182,10 +224,10 @@ public class ServoTuner extends LinearOpMode
                         {
                             if(mode == ServoTunerModes.CHANGE_GRANULARITY)
                             {
-                                granularity = granularity + GRANULARITY_DELTA;
-                                if(granularity > GRANULARITY_MAX)
+                                proposedValue += GRANULARITY_DELTA;
+                                if(proposedValue > GRANULARITY_MAX)
                                 {
-                                    granularity = GRANULARITY_MAX;
+                                    proposedValue = GRANULARITY_MAX;
                                 }
                             }
                             else
@@ -203,10 +245,21 @@ public class ServoTuner extends LinearOpMode
                     {
                         if(mode != ServoTunerModes.INIT)
                         {
-                            proposedValue -= granularity;
-                            if(proposedValue < 0.0)
+                            if(mode == ServoTunerModes.CHANGE_GRANULARITY)
                             {
-                                proposedValue = 0.0;
+                                proposedValue -= GRANULARITY_DELTA;
+                                if(proposedValue < GRANULARITY_MIN)
+                                {
+                                    proposedValue = GRANULARITY_MIN;
+                                }
+                            }
+                            else
+                            {
+                                proposedValue -= granularity;
+                                if(proposedValue < 0.0)
+                                {
+                                    proposedValue = 0.0;
+                                }
                             }
                         }
                         break;
@@ -239,13 +292,16 @@ public class ServoTuner extends LinearOpMode
                         {
                             case CHANGE_GRANULARITY:
                                 granularity = proposedValue;
+                                currentValue = proposedValue;
                                 break;
                             case CHANGE_POSITION:
                                 servoData.get(currentServoIndex).proposedPosition = proposedValue;
                                 servos.get(currentServoIndex).setPosition(proposedValue);
+                                currentValue = proposedValue;
                                 break;
                             case CHANGE_INIT_POSITION:
                                 servoData.get(currentServoIndex).initPosition = proposedValue;
+                                currentValue = proposedValue;
                                 break;
                             case INIT:
                                 servos.get(currentServoIndex).setPosition(servoData.get(currentServoIndex).initPosition);
@@ -263,6 +319,7 @@ public class ServoTuner extends LinearOpMode
                 // Display telemetry
                 telemetry.clearAll();
                 telemetry.addData("Mode: ", mode.toString());
+                telemetry.addData("Servo Number: ", currentServoIndex);
                 if(mode != ServoTunerModes.INIT)
                 {
                     telemetry.addData("Proposed Value: ", proposedValue);
