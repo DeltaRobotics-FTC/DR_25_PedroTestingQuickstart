@@ -95,6 +95,8 @@ public class ServoTuner extends LinearOpMode
 
     private List<Servo> servos = new ArrayList<Servo>();
 
+    private boolean canExecuteAction = true;
+
     @Override
     public void runOpMode() throws InterruptedException
     {
@@ -139,65 +141,67 @@ public class ServoTuner extends LinearOpMode
             }
             else
             {
+                // Allow command execution since all buttons have been released.
+                canExecuteAction = true;
                 command = ServoTunerCommands.NO_COMMAND;
             }
 
-            // Now that we know the command, perform it!
-            switch(command)
+            if(canExecuteAction)
             {
-                case INCREMENT_SERVO_INDEX:
+                // When executing a real command, lock out command execution so we
+                // don't keep on executing the same command.
+                // All buttons need to be released before we can execute again.
+                if(command != ServoTunerCommands.NO_COMMAND)
                 {
-                    currentServoIndex = (currentServoIndex + 1) % MAX_SERVO_COUNT;
-                    break;
+                    canExecuteAction = false;
                 }
-                case DECREMENT_SERVO_INDEX:
+
+                // Now that we know the command, perform it!
+                switch(command)
                 {
-                    if(currentServoIndex == 0)
+                    case INCREMENT_SERVO_INDEX:
                     {
-                        currentServoIndex = MAX_SERVO_COUNT - 1;
+                        currentServoIndex = (currentServoIndex + 1) % MAX_SERVO_COUNT;
+                        break;
                     }
-                    else
+                    case DECREMENT_SERVO_INDEX:
                     {
-                        currentServoIndex--;
-                    }
-                    break;
-                }
-                case INCREMENT_VALUE:
-                {
-                    if(mode != ServoTunerModes.INIT)
-                    {
-                        if(mode == ServoTunerModes.CHANGE_GRANULARITY)
+                        if(currentServoIndex == 0)
                         {
-                            granularity = granularity + GRANULARITY_DELTA;
-                            if(granularity > GRANULARITY_MAX)
-                            {
-                                granularity = GRANULARITY_MAX;
-                            }
+                            currentServoIndex = MAX_SERVO_COUNT - 1;
                         }
                         else
                         {
-                            proposedValue += granularity;
-                            if(proposedValue > 1.0)
-                            {
-                                proposedValue = 1.0;
-                            }
+                            currentServoIndex--;
                         }
+                        break;
                     }
-                    break;
-                }
-                case DECREMENT_VALUE:
-                {
-                    if(mode != ServoTunerModes.INIT)
+                    case INCREMENT_VALUE:
                     {
-                        if(mode == ServoTunerModes.CHANGE_GRANULARITY)
+                        if(mode != ServoTunerModes.INIT)
                         {
-                            granularity = granularity - GRANULARITY_DELTA;
-                            if(granularity < GRANULARITY_MIN)
+                            if(mode == ServoTunerModes.CHANGE_GRANULARITY)
                             {
-                                granularity = GRANULARITY_MIN;
+                                granularity = granularity + GRANULARITY_DELTA;
+                                if(granularity > GRANULARITY_MAX)
+                                {
+                                    granularity = GRANULARITY_MAX;
+                                }
+                            }
+                            else
+                            {
+                                proposedValue += granularity;
+                                if(proposedValue > 1.0)
+                                {
+                                    proposedValue = 1.0;
+                                }
                             }
                         }
-                        else
+                        break;
+                    }
+                    case DECREMENT_VALUE:
+                    {
+                        if(mode != ServoTunerModes.INIT)
                         {
                             proposedValue -= granularity;
                             if(proposedValue < 0.0)
@@ -205,22 +209,66 @@ public class ServoTuner extends LinearOpMode
                                 proposedValue = 0.0;
                             }
                         }
+                        break;
                     }
-                    break;
+                    case TOGGLE_MODE:
+                    {
+                        mode = mode.getNextMode();
+
+                        // Update the current and proposed value to start at the correct one.
+                        switch(mode)
+                        {
+                            case CHANGE_POSITION:
+                                proposedValue = servoData.get(currentServoIndex).proposedPosition;
+                                break;
+                            case CHANGE_INIT_POSITION:
+                                proposedValue = servoData.get(currentServoIndex).initPosition;
+                                break;
+                            case CHANGE_GRANULARITY:
+                                proposedValue = granularity;
+                                break;
+                            default:
+                                break;
+                        }
+                        currentValue = proposedValue;
+                        break;
+                    }
+                    case EXECUTE_ACTION:
+                    {
+                        switch(mode)
+                        {
+                            case CHANGE_GRANULARITY:
+                                granularity = proposedValue;
+                                break;
+                            case CHANGE_POSITION:
+                                servoData.get(currentServoIndex).proposedPosition = proposedValue;
+                                servos.get(currentServoIndex).setPosition(proposedValue);
+                                break;
+                            case CHANGE_INIT_POSITION:
+                                servoData.get(currentServoIndex).initPosition = proposedValue;
+                                break;
+                            case INIT:
+                                servos.get(currentServoIndex).setPosition(servoData.get(currentServoIndex).initPosition);
+                                servoData.get(currentServoIndex).proposedPosition = servoData.get(currentServoIndex).initPosition;
+                                break;
+                        }
+                        break;
+                    }
+                    case NO_COMMAND:
+                    {
+                        break;
+                    }
                 }
-                case TOGGLE_MODE:
+
+                // Display telemetry
+                telemetry.clearAll();
+                telemetry.addData("Mode: ", mode.toString());
+                if(mode != ServoTunerModes.INIT)
                 {
-                    mode = mode.getNextMode();
-                    break;
+                    telemetry.addData("Proposed Value: ", proposedValue);
+                    telemetry.addData("Current Value: ", currentValue);
                 }
-                case EXECUTE_ACTION:
-                {
-                    break;
-                }
-                default:
-                {
-                    break;
-                }
+                telemetry.update();
             }
         }
     }
