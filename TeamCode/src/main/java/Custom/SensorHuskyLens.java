@@ -30,7 +30,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package Custom;
 
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
  *
  * For detailed instructions on how a HuskyLens is used in FTC, please see this tutorial:
  * https://ftc-docs.firstinspires.org/en/latest/devices/huskylens/huskylens.html
- * 
+ *
  * This sample illustrates how to detect AprilTags, but can be used to detect other types
  * of objects by changing the algorithm. It assumes that the HuskyLens is configured with
  * a name of "huskylens".
@@ -63,13 +63,15 @@ import java.util.concurrent.TimeUnit;
 //@Disabled
 public class SensorHuskyLens extends LinearOpMode {
 
+    private static boolean GPP = true;
     private final int READ_PERIOD = 1;
+
+    private int Vision = 1;
 
     private HuskyLens huskyLens;
 
     @Override
-    public void runOpMode()
-    {
+    public void runOpMode() {
         huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
 
         /*
@@ -116,7 +118,24 @@ public class SensorHuskyLens extends LinearOpMode {
         huskyLens.selectAlgorithm(HuskyLens.Algorithm.TAG_RECOGNITION);
 
         telemetry.update();
-        waitForStart();
+        while(!isStarted() && !isStopRequested()) {
+
+            HuskyLens.Block[] blocks = huskyLens.blocks();
+            telemetry.addData("Block count", blocks.length);
+            for (int i = 0; i < blocks.length; i++) {
+                telemetry.addData("Block", blocks[i].id);
+                //Vision = blocks[i].id;
+
+                if(blocks[i].id == 1 || blocks[i].id == 2 || blocks[i].id == 3){
+                    Vision = blocks[i].id;
+
+                }
+            }
+            telemetry.update();
+
+
+
+        }
 
         /*
          * Looking for AprilTags per the call to selectAlgorithm() above.  A handy grid
@@ -124,21 +143,18 @@ public class SensorHuskyLens extends LinearOpMode {
          *
          * Note again that the device only recognizes the 36h11 family of tags out of the box.
          */
-        while(opModeIsActive()) {
+        while (opModeIsActive()) {
             if (!rateLimit.hasExpired()) {
                 continue;
             }
             rateLimit.reset();
 
-            /*
-             * All algorithms, except for LINE_TRACKING, return a list of Blocks where a
-             * Block represents the outline of a recognized object along with its ID number.
-             * ID numbers allow you to identify what the device saw.  See the HuskyLens documentation
-             * referenced in the header comment above for more information on IDs and how to
-             * assign them to objects.
-             *
-             * Returns an empty array if no objects are seen.
-             */
+            if(Vision == 1){
+
+
+
+            }
+
             HuskyLens.Block[] blocks = huskyLens.blocks();
             telemetry.addData("Block count", blocks.length);
             for (int i = 0; i < blocks.length; i++) {
@@ -149,5 +165,9 @@ public class SensorHuskyLens extends LinearOpMode {
             telemetry.update();
         }
 
+
     }
+
 }
+
+
