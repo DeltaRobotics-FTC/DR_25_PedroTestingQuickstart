@@ -16,7 +16,10 @@ public class emptyOpmode extends LinearOpMode
     public void runOpMode() throws InterruptedException
     {
 
-        waitForStart();
+        while(!isStarted() && !isStopRequested()) {
+
+
+        }
 
         while (opModeIsActive())
         {

@@ -30,8 +30,6 @@ public class teleop extends LinearOpMode
 
     private int Vision = 1;
 
-    private HuskyLens huskyLens;
-
     public DcMotor intake = null;
 
     public DcMotor shooter = null;
@@ -71,36 +69,8 @@ public class teleop extends LinearOpMode
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
 
-        huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
-
-        Deadline rateLimit = new Deadline(READ_PERIOD, TimeUnit.SECONDS);
-
-        rateLimit.expire();
-
-        if (!huskyLens.knock()) {
-            telemetry.addData(">>", "Problem communicating with " + huskyLens.getDeviceName());
-        } else {
-            telemetry.addData(">>", "Press start to continue");
-        }
-
-        huskyLens.selectAlgorithm(HuskyLens.Algorithm.TAG_RECOGNITION);
-
-        telemetry.update();
 
         while(!isStarted() && !isStopRequested()) {
-
-            HuskyLens.Block[] blocks = huskyLens.blocks();
-            telemetry.addData("Block count", blocks.length);
-            for (int i = 0; i < blocks.length; i++) {
-                telemetry.addData("Block", blocks[i].id);
-                //Vision = blocks[i].id;
-
-                if(blocks[i].id == 1 || blocks[i].id == 2 || blocks[i].id == 3){
-                    Vision = blocks[i].id;
-
-                }
-            }
-            telemetry.update();
 
             shooter.setPower(.5);
             shooter.setTargetPosition(0);
@@ -109,7 +79,6 @@ public class teleop extends LinearOpMode
             intake.setPower(.5);
             intake.setTargetPosition(0);
             intake.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
 
         }
 
@@ -120,22 +89,6 @@ public class teleop extends LinearOpMode
 
             follower.setTeleOpMovementVectors(-gamepad1.right_stick_y, -gamepad1.right_stick_x, -gamepad1.left_stick_x, true);
             follower.update();
-
-            while (opModeIsActive()) {
-                if (!rateLimit.hasExpired()) {
-                    continue;
-                }
-                rateLimit.reset();
-
-                HuskyLens.Block[] blocks = huskyLens.blocks();
-                telemetry.addData("Block count", blocks.length);
-                for (int i = 0; i < blocks.length; i++) {
-                    telemetry.addData("Block", blocks[i].toString());
-
-                }
-
-                telemetry.update();
-            }
 
             if(gamepad1.a && buttonA){
 
