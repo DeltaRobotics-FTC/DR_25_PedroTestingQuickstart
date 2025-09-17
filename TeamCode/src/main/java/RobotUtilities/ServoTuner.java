@@ -213,10 +213,6 @@ public class ServoTuner extends LinearOpMode
                     mode = mode.getNextMode();
                     break;
                 }
-                case EXECUTE_ACTION:
-                {
-                    break;
-                }
                 default:
                 {
                     break;
