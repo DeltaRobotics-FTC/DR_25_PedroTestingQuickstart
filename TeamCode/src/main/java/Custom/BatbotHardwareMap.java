@@ -16,7 +16,7 @@ import com.pedropathing.follower.Follower;
 @Config //We need this for Dashboard to change variables
 public class BatbotHardwareMap {
 
-    //FtcDashboard dashboard = FtcDashboard.getInstance();
+    FtcDashboard dashboard = FtcDashboard.getInstance();
     //drive motors
     public DcMotor motorRF = null;
     public DcMotor motorLF = null;
