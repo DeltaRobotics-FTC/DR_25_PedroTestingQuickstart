@@ -1,20 +1,15 @@
 package Custom;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.localization.Pose;
-import com.pedropathing.pathgen.BezierCurve;
-import com.pedropathing.pathgen.BezierLine;
-import com.pedropathing.pathgen.Path;
-import com.pedropathing.pathgen.PathChain;
-import com.pedropathing.pathgen.Point;
-import com.pedropathing.util.Constants;
+import com.pedropathing.geometry.BezierCurve;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.Path;
+import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
 
 
 /**
@@ -76,7 +71,7 @@ public class stepByStepAuto extends OpMode {
     private final Pose parkControlPose = new Pose(10, 54, Math.toRadians(0));
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
-    private Path  move0, park;
+    private Path move0, park;
     private PathChain move1, move2;
 
 
@@ -100,7 +95,7 @@ public class stepByStepAuto extends OpMode {
          * Here is a explanation of the difference between Paths and PathChains <https://pedropathing.com/commonissues/pathtopathchain.html> */
 
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
-        move0 = new Path(new BezierLine(new Point(startPose), new Point(bottomRightCorner)));
+        move0 = new Path(new BezierLine(startPose, bottomRightCorner));
         move0.setTangentHeadingInterpolation();
 
         /* Here is an example for Constant Interpolation
@@ -108,12 +103,12 @@ public class stepByStepAuto extends OpMode {
 
         /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         move1 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(bottomRightCorner), new Point(topRightCorner)))
+                .addPath(new BezierLine(bottomRightCorner, topRightCorner))
                 .setTangentHeadingInterpolation().build();
 
         ///* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         move2 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(topRightCorner), new Point(topLeftCorner)))
+                .addPath(new BezierLine(topRightCorner, topLeftCorner))
                 .setTangentHeadingInterpolation().build();
 
         /* This is our grabPickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
@@ -141,7 +136,7 @@ public class stepByStepAuto extends OpMode {
         //        .build();
 
         /* This is our park path. We are using a BezierCurve with 3 points, which is a curved line that is curved based off of the control point */
-        park = new Path(new BezierCurve(new Point(topLeftCorner), /* Control Point */ new Point(parkControlPose), new Point(parkPose)));
+        park = new Path(new BezierCurve(topLeftCorner, /* Control Point */ parkControlPose, parkPose));
         park.setTangentHeadingInterpolation();
     }
 
@@ -240,8 +235,9 @@ public class stepByStepAuto extends OpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
-        Constants.setConstants(FConstants.class, LConstants.class);
-        follower = new Follower(hardwareMap);
+        // TODO: Update!!!
+        //Constants.setConstants(FConstants.class, LConstants.class);
+        //follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
         buildPaths();
     }

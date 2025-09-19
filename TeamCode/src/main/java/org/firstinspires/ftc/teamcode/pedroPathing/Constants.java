@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
-import com.pedropathing.follower.FollowerConstants;
+
 import com.pedropathing.follower.Follower;
+import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.Encoder;
@@ -9,7 +10,6 @@ import com.pedropathing.ftc.localization.constants.ThreeWheelConstants;
 import com.pedropathing.paths.PathConstraints;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
 
 public class Constants {
 
@@ -28,16 +28,16 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .xMovement(338.9431)
-            .yMovement(253.1578);
+            .xVelocity(338.9431)
+            .yVelocity(253.1578);
 
     public static ThreeWheelConstants localizerConstants =
             new ThreeWheelConstants()
                     .forwardTicksToInches(.003)
                     .strafeTicksToInches(.003)
                     .turnTicksToInches(.0036)
-                    .leftY(8)
-                    .rightY(-8)
+                    .leftPodY(8)
+                    .rightPodY(-8)
                     .strafePodX(-3.5)
                     .leftEncoder_HardwareMapName("motorLB")
                     .rightEncoder_HardwareMapName("motorRB")

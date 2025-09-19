@@ -1,18 +1,13 @@
 package Custom;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.localization.Pose;
-import com.pedropathing.pathgen.BezierCurve;
-import com.pedropathing.pathgen.BezierLine;
-import com.pedropathing.pathgen.Path;
-import com.pedropathing.pathgen.PathChain;
-import com.pedropathing.pathgen.Point;
-import com.pedropathing.util.Constants;
+import com.pedropathing.geometry.BezierCurve;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.Path;
+import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
 
 
 /**
@@ -70,7 +65,7 @@ public class curveAuto extends OpMode {
     private final Pose parkControlPose = new Pose(10, 54, Math.toRadians(0));
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
-    private Path  move0, park;
+    private Path move0, park;
     private PathChain move1, move2;
 
     /** Build the paths for the auto (adds, for example, constant/linear headings while doing paths)
@@ -100,11 +95,11 @@ public class curveAuto extends OpMode {
 
         /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         move1 = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(startPose), new Point(bottomRightCorner), new Point(topRightCorner), new Point(topLeftCorner)))
+                .addPath(new BezierCurve(startPose, bottomRightCorner, topRightCorner, topLeftCorner))
                 .setTangentHeadingInterpolation().build();
 
         /* This is our park path. We are using a BezierCurve with 3 points, which is a curved line that is curved based off of the control point */
-        park = new Path(new BezierCurve(new Point(topLeftCorner), /* Control Point */ new Point(parkControlPose), new Point(parkPose)));
+        park = new Path(new BezierCurve(topLeftCorner, /* Control Point */ parkControlPose, parkPose));
         park.setTangentHeadingInterpolation();
     }
 
@@ -187,8 +182,9 @@ public class curveAuto extends OpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
-        Constants.setConstants(FConstants.class, LConstants.class);
-        follower = new Follower(hardwareMap);
+        // TODO: Update!!!
+        //Constants.setConstants(FConstants.class, LConstants.class);
+        //follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
         buildPaths();
     }
