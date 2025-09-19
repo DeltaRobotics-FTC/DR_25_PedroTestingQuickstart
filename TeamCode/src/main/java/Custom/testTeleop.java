@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.pedropathing.follower.Follower;
 
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.concurrent.TimeUnit;
 
@@ -77,9 +78,7 @@ public class testTeleop extends LinearOpMode
         wrist = hardwareMap.servo.get("wrist");
         claw = hardwareMap.servo.get("claw");
 
-        // TODO: Udpate!!!
-        //Constants.setConstants(FConstants.class, LConstants.class);
-        //follower = new Follower(hardwareMap);
+        follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
 
         //small numbers are out
@@ -100,8 +99,7 @@ public class testTeleop extends LinearOpMode
 
         while (opModeIsActive()) {
 
-            // TODO: Update!!!
-            //follower.setTeleOpMovementVectors(-gamepad1.right_stick_y, -gamepad1.right_stick_x, -gamepad1.left_stick_x, true);
+            follower.setTeleOpDrive(-gamepad1.right_stick_y, -gamepad1.right_stick_x, -gamepad1.left_stick_x, true);
             follower.update();
 
             if (!rateLimit.hasExpired()) {
