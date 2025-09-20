@@ -3,12 +3,8 @@ package Custom;
 
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.pedropathing.follower.Follower;
@@ -29,10 +25,9 @@ public class testTeleop extends LinearOpMode
 
     private HuskyLens huskyLens;
 
-    public Servo LHE = null;
-    public Servo RHE = null;
-    public Servo wrist = null;
-    public Servo claw = null;
+    private Servo turret = null;
+
+    private Servo hood = null;
 
     public boolean buttonLT = true;
     public boolean buttonRT = true;
@@ -56,7 +51,10 @@ public class testTeleop extends LinearOpMode
     public void runOpMode() throws InterruptedException {
         BatbotHardwareMap robot = new BatbotHardwareMap(hardwareMap);
 
-        huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
+        turret = hardwareMap.servo.get("cameraTurret");
+        hood = hardwareMap.servo.get("hood");
+
+        huskyLens = hardwareMap.get(HuskyLens.class, "huskyLens");
 
         Deadline rateLimit = new Deadline(READ_PERIOD, TimeUnit.SECONDS);
 
@@ -72,35 +70,25 @@ public class testTeleop extends LinearOpMode
 
         telemetry.update();
 
-        LHE = hardwareMap.servo.get("LHE");
-        RHE = hardwareMap.servo.get("RHE");
-
-        wrist = hardwareMap.servo.get("wrist");
-        claw = hardwareMap.servo.get("claw");
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
 
-        //small numbers are out
-        LHE.setPosition(.905);
-        RHE.setPosition(.905);
 
-        //lower numbers go up
-        wrist.setPosition(.65);
+        while (!isStarted() && !isStopRequested()) {
 
-        //bigger numbers are open
-        claw.setPosition(.6);
+            turret.setPosition(0.5);//0.5 is facing somewhat forward & 0 is facing towards motorRF
+            hood.setPosition(0);// 0 is clockwise from facing the servo
 
-        waitForStart();
+        }
 
         follower.startTeleopDrive();
 
-
-
         while (opModeIsActive()) {
 
-            follower.setTeleOpDrive(-gamepad1.right_stick_y, -gamepad1.right_stick_x, -gamepad1.left_stick_x, true);
-            follower.update();
+            follower = Constants.createFollower(hardwareMap);
+            robot.mecanumDrive(-gamepad1.right_stick_y, -gamepad1.right_stick_x, -gamepad1.left_stick_x, .75);
+
 
             if (!rateLimit.hasExpired()) {
                 continue;
@@ -124,92 +112,68 @@ public class testTeleop extends LinearOpMode
             telemetry.update();
 
 
+            // TURRET CONTROLS
+            if (gamepad1.y && buttonY){
 
-            //pushing the slides out
-            if(gamepad1.right_trigger > .5 && buttonRT){
+                turret.setPosition(0.5);//facing forward ish
 
-                LHE.setPosition(robot.SLIDES_OUT);
-                RHE.setPosition(robot.SLIDES_OUT);
-
-                buttonRT = false;
+                buttonY = false;
             }
-
-            if(gamepad1.right_trigger < .5 && !buttonRT){
-
-                buttonRT = true;
-            }
-
-            // bringing the slides inside
-             if(gamepad1.left_trigger > .5 && buttonLT){
-                LHE.setPosition(robot.SLIDES_INSIDE);
-                RHE.setPosition(robot.SLIDES_INSIDE);
-
-                buttonLT = false;
-             }
-             if(gamepad1.left_trigger < .5 && !buttonLT){
-
-                buttonLT = true;
-            }
-
-             //wrist up position
-             if(gamepad1.y && buttonY){
-
-                 wrist.setPosition(robot.WRIST_UP);
-
-                 buttonY = false;
-
-             }
-
-            if(!gamepad1.y && !buttonY){
+            if (!gamepad1.y && !buttonY){
 
                 buttonY = true;
-
             }
 
-            //wrist down position
-            if(gamepad1.a && buttonA){
 
-                wrist.setPosition(robot.WRIST_DOWN);
+            if (gamepad1.x && buttonX){
 
-                buttonA = false;
+                turret.setPosition(0.2);
 
+                buttonX = false;
+            }
+            if (!gamepad1.x && !buttonX){
+
+                buttonX = true;
             }
 
-            if(!gamepad1.a && !buttonA){
 
-                buttonA = true;
+            if (gamepad1.b && buttonB){
 
+                turret.setPosition(0.8);
+
+                buttonB = false;
+            }
+            if (!gamepad1.b && !buttonB){
+
+                buttonB = true;
             }
 
-            //claw closed position
-            if(gamepad1.left_bumper && buttonLB){
 
-                claw.setPosition(robot.CLAW_CLOSE);
 
-                buttonLB = false;
+            //CAMERA HOOD CONTROLS
+            if (gamepad1.dpad_down && buttonDD){
 
+                hood.setPosition(0.5);
+
+                buttonDD = false;
+            }
+            if (!gamepad1.dpad_down && !buttonDD){
+
+                buttonDD = true;
             }
 
-            if(!gamepad1.left_bumper && !buttonLB){
 
-                buttonLB = true;
+            if (gamepad1.dpad_up && buttonDU){
 
+                hood.setPosition(8);
+
+                buttonDU = false;
+            }
+            if (!gamepad1.dpad_up && !buttonDU){
+
+                buttonDU = true;
             }
 
-            //claw open position
-            if(gamepad1.right_bumper && buttonRB){
-
-                claw.setPosition(robot.CLAW_OPEN);
-
-                buttonRB = false;
-
-            }
-
-            if(!gamepad1.right_bumper && !buttonRB){
-
-                buttonRB = true;
-
-            }
 
 
         }

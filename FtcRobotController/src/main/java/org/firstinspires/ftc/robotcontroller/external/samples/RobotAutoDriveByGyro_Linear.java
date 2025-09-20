@@ -165,6 +165,7 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
         // Ensure the robot is stationary.  Reset the encoders and set the motors to BRAKE mode
         leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
