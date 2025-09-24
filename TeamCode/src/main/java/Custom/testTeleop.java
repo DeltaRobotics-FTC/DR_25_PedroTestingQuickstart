@@ -3,12 +3,16 @@ package Custom;
 
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.pedropathing.follower.Follower;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
@@ -28,6 +32,8 @@ public class testTeleop extends LinearOpMode
     private Servo turret = null;
 
     private Servo hood = null;
+
+    private IMU imu         = null;
 
     public boolean buttonLT = true;
     public boolean buttonRT = true;
@@ -56,6 +62,13 @@ public class testTeleop extends LinearOpMode
 
         huskyLens = hardwareMap.get(HuskyLens.class, "huskyLens");
 
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+
+        imu = hardwareMap.get(IMU.class, "imu");
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
+
         Deadline rateLimit = new Deadline(READ_PERIOD, TimeUnit.SECONDS);
 
         rateLimit.expire();
@@ -70,15 +83,15 @@ public class testTeleop extends LinearOpMode
 
         telemetry.update();
 
-
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
 
 
+
         while (!isStarted() && !isStopRequested()) {
 
-            turret.setPosition(0.5);//0.5 is facing somewhat forward & 0 is facing towards motorRF
-            hood.setPosition(0);// 0 is clockwise from facing the servo
+            turret.setPosition(1);//bigger number goes clockwise when looking down on the robot
+            hood.setPosition(0);// 0 is clockwise from looking at the top of the servo
 
         }
 
@@ -174,6 +187,8 @@ public class testTeleop extends LinearOpMode
                 buttonDU = true;
             }
 
+            YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+            orientation.getYaw(AngleUnit.DEGREES);
 
 
         }

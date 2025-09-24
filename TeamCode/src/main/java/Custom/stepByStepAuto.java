@@ -106,7 +106,7 @@ public class stepByStepAuto extends OpMode {
                 .addPath(new BezierLine(bottomRightCorner, topRightCorner))
                 .setTangentHeadingInterpolation().build();
 
-        ///* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
+
         move2 = follower.pathBuilder()
                 .addPath(new BezierLine(topRightCorner, topLeftCorner))
                 .setTangentHeadingInterpolation().build();

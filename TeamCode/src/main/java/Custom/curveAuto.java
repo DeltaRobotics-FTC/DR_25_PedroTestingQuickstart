@@ -83,12 +83,11 @@ public class curveAuto extends OpMode {
          *    * Constant Heading Interpolation:
          *    - Pedro will maintain one heading throughout the entire path.
          *    * Tangential Heading Interpolation:
-         *    - Pedro will follows the angle of the path such that the robot is always driving forward when it follows the path.
+         *    - Pedro will follow the angle of the path such that the robot is always driving forward when it follows the path.
          * PathChains hold Path(s) within it and are able to hold their end point, meaning that they will holdPoint until another path is followed.
          * Here is a explanation of the difference between Paths and PathChains <https://pedropathing.com/commonissues/pathtopathchain.html> */
 
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
-
 
         /* Here is an example for Constant Interpolation
         scorePreload.setConstantInterpolation(startPose.getHeading()); */
@@ -182,7 +181,6 @@ public class curveAuto extends OpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
-        // TODO: Update!!!
         //Constants.setConstants(FConstants.class, LConstants.class);
         //follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
