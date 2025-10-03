@@ -95,6 +95,8 @@ public class testTeleop extends LinearOpMode
 
         }
 
+        imu.resetYaw();
+
         follower.startTeleopDrive();
 
         while (opModeIsActive()) {
