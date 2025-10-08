@@ -50,6 +50,8 @@ public class imuTurnToAngle extends LinearOpMode
     public void runOpMode() throws InterruptedException
     {
 
+
+
         turret = hardwareMap.servo.get("turret");
 
         /*
@@ -91,9 +93,9 @@ public class imuTurnToAngle extends LinearOpMode
         while (opModeIsActive())
         {
 
-            //+ ten degrees - ten degrees
-            //+ one degree - one degree
+            orentationData = imu.getRobotYawPitchRollAngles();
 
+            turret.setPosition((147.3 + orentationData.getYaw()) * turretDegreeRatio);
 
             //Multiplying current position by 10
             if(gamepad1.a && buttonA){
@@ -152,8 +154,6 @@ public class imuTurnToAngle extends LinearOpMode
             }
 
 
-
-            orentationData = imu.getRobotYawPitchRollAngles();
 
             telemetry.addData("turretCurrentPosition", turret.getPosition());
 
